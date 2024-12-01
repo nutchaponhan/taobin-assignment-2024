@@ -4,7 +4,7 @@ import { delay } from '../utils';
 
 export class PublishSubscribeService implements IPublishSubscribeService {
   private _events: IEvent[] = [];
-  private _subscriptions: Record<string, ISubscriber | null> = {};
+  private _subscriptions: Record<string, ISubscriber[]> = {};
 
   sendEvent(event: IEvent): void {
     this._events.push(event);
@@ -12,16 +12,12 @@ export class PublishSubscribeService implements IPublishSubscribeService {
 
   publish(event: IEvent): void {
     const { type } = event;
-    const subscriber = this._subscriptions[type()];
+    const subscribers = this._subscriptions[type()];
 
-    if (!subscriber) {
-      // reject transaction
-      console.log('subscriber not found');
-      return;
+    console.log(`publish event`, event);
+    for (const subscriber of subscribers) {
+      subscriber.handle(event);
     }
-
-    console.log('publish', event);
-    subscriber.handle(event);
   }
 
   unsubscribe(type: string): void {
@@ -30,7 +26,10 @@ export class PublishSubscribeService implements IPublishSubscribeService {
   }
 
   subscribe(type: string, subscriber: ISubscriber): void {
-    this._subscriptions[type] = subscriber;
+    if (!this._subscriptions[type]) {
+      this._subscriptions[type] = [];
+    }
+    this._subscriptions[type].push(subscriber);
   }
 
   async watch(events: IEvent[]): Promise<void> {

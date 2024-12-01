@@ -6,6 +6,7 @@ import {
   ISubscriber,
   IPublishSubscribeService,
   matchState,
+  IMachineRepository,
 } from '../type';
 import { MachineStockLevelOkEvent } from './stock-level-ok';
 
@@ -30,29 +31,29 @@ export class MachineRefillEvent implements IEvent {
 
 export class MachineRefillSubscriber implements ISubscriber {
   constructor(
-    private machines: Machine[],
+    private machineRepository: IMachineRepository,
     private pubSubService: IPublishSubscribeService
-  ) {
-    this.machines = machines;
-    this.pubSubService = pubSubService;
-  }
+  ) {}
 
   handle(event: MachineRefillEvent): void {
     const machineId = event.machineId();
-    const machineIndex = this.machines.findIndex(
-      (m) => m.id === machineId
-    ) as number;
 
-    const machine = this.machines[machineIndex];
-    const prevMachineState = this.machines[machineIndex].state;
+    let machine = this.machineRepository.find(machineId);
 
-    machine.changeStock(event.getRefillStockLevel());
+    const prevMachineState = machine.state;
 
-    if (machine.stockLevel >= 3 && prevMachineState === matchState.stockLow) {
-      this.sendEvent(new MachineStockLevelOkEvent(machineId));
+    machine.stockLevel += event.getRefillStockLevel();
+
+    const stockLevelOk = machine.stockLevel >= 3;
+    machine.state = stockLevelOk ? matchState.stockOk : matchState.stockLow;
+
+    machine = this.machineRepository.update(machine);
+
+    if (stockLevelOk && prevMachineState === matchState.stockLow) {
+      this.sendEvent(
+        new MachineStockLevelOkEvent(machine.stockLevel, machineId)
+      );
     }
-
-    console.log({ state: this.machines });
   }
 
   sendEvent(event: IEvent): void {

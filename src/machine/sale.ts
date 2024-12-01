@@ -6,6 +6,7 @@ import {
   eventType,
   IPublishSubscribeService,
   matchState,
+  IMachineRepository,
 } from '../type';
 import { MachineLowStockWarningEvent } from './low-stock-warning';
 
@@ -30,29 +31,29 @@ export class MachineSaleEvent implements IEvent {
 
 export class MachineSaleSubscriber implements ISubscriber {
   constructor(
-    private machines: Machine[],
+    private machineRepository: IMachineRepository,
     private pubSubService: IPublishSubscribeService
-  ) {
-    this.machines = machines;
-    this.pubSubService = pubSubService;
-  }
+  ) {}
 
   handle(event: MachineSaleEvent): void {
     const machineId = event.machineId();
-    const machineIndex = this.machines.findIndex(
-      (m) => m.id === machineId
-    ) as number;
 
-    const machine = this.machines[machineIndex];
-    const prevMachineState = this.machines[machineIndex].state;
+    let machine = this.machineRepository.find(machineId);
 
-    machine.changeStock(-event.getSoldQuantity());
+    const prevMachineState = machine.state;
 
-    if (machine.stockLevel < 3 && prevMachineState === matchState.stockOk) {
-      this.sendEvent(new MachineLowStockWarningEvent(machineId));
+    machine.stockLevel -= event.getSoldQuantity();
+
+    const stockLevelDrop = machine.stockLevel < 3;
+    machine.state = stockLevelDrop ? matchState.stockLow : matchState.stockOk;
+
+    machine = this.machineRepository.update(machine);
+
+    if (stockLevelDrop && prevMachineState === matchState.stockOk) {
+      this.sendEvent(
+        new MachineLowStockWarningEvent(machine.stockLevel, machineId)
+      );
     }
-
-    console.log({ state: this.machines });
   }
 
   sendEvent(event: IEvent): void {

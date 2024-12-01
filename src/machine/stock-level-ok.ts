@@ -8,10 +8,17 @@ import {
 } from '../type';
 
 export class MachineStockLevelOkEvent implements IEvent {
-  constructor(private readonly _machineId: string) {}
+  constructor(
+    private readonly _stockLevel: number,
+    private readonly _machineId: string
+  ) {}
 
   machineId(): string {
     return this._machineId;
+  }
+
+  getStockLevel(): number {
+    return this._stockLevel;
   }
 
   type(): EventType {
@@ -20,18 +27,15 @@ export class MachineStockLevelOkEvent implements IEvent {
 }
 
 export class MachineStockLevelOkSubscriber implements ISubscriber {
-  constructor(
-    private machines: Machine[],
-    private pubSubService: IPublishSubscribeService
-  ) {
-    this.machines = machines;
-    this.pubSubService = pubSubService;
-  }
+  constructor(private pubSubService: IPublishSubscribeService) {}
 
   handle(event: MachineStockLevelOkEvent): void {
     const machineId = event.machineId();
+    const stockLevel = event.getStockLevel();
 
-    console.log(`stock machine id :${machineId} levels hits 3 or above`);
+    console.log(
+      `stock machine id :${machineId} stock level left ${stockLevel} ,levels above or equal 3`
+    );
   }
 
   sendEvent(event: IEvent): void {

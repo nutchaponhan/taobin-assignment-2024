@@ -5,13 +5,21 @@ import {
   eventType,
   ISubscriber,
   IPublishSubscribeService,
+  IMachineRepository,
 } from '../type';
 
 export class MachineLowStockWarningEvent implements IEvent {
-  constructor(private readonly _machineId: string) {}
+  constructor(
+    private readonly _stockLevel: number,
+    private readonly _machineId: string
+  ) {}
 
   machineId(): string {
     return this._machineId;
+  }
+
+  getStockLevel(): number {
+    return this._stockLevel;
   }
 
   type(): EventType {
@@ -20,18 +28,14 @@ export class MachineLowStockWarningEvent implements IEvent {
 }
 
 export class MachineLowStockSubscriber implements ISubscriber {
-  constructor(
-    private machines: Machine[],
-    private pubSubService: IPublishSubscribeService
-  ) {
-    this.machines = machines;
-    this.pubSubService = pubSubService;
-  }
+  constructor(private pubSubService: IPublishSubscribeService) {}
 
   handle(event: MachineLowStockWarningEvent): void {
     const machineId = event.machineId();
-
-    console.log(`stock machine id :${machineId} levels drops below 3`);
+    const stockLevel = event.getStockLevel();
+    console.log(
+      `stock machine id :${machineId} stock level left ${stockLevel} ,levels drops below 3`
+    );
   }
 
   sendEvent(event: IEvent): void {

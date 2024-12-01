@@ -2,6 +2,7 @@ import {
   Machine,
   MachineLowStockSubscriber,
   MachineRefillSubscriber,
+  MachineRepository,
   MachineSaleSubscriber,
   PublishSubscribeService,
 } from './machine';
@@ -35,18 +36,22 @@ function simulateEvent(): IEvent[] {
     new Machine('003'),
   ];
 
+  const machineRepository = new MachineRepository(machines);
+
   // create the PubSub service
   const pubSubService = new PublishSubscribeService();
 
   // create a machine sale event subscriber. inject the machines (all subscribers should do this)
-  const saleSubscriber = new MachineSaleSubscriber(machines, pubSubService);
-  const refillSubscriber = new MachineRefillSubscriber(machines, pubSubService);
-  const lowStockSubscriber = new MachineLowStockSubscriber(
-    machines,
+  const saleSubscriber = new MachineSaleSubscriber(
+    machineRepository,
     pubSubService
   );
+  const refillSubscriber = new MachineRefillSubscriber(
+    machineRepository,
+    pubSubService
+  );
+  const lowStockSubscriber = new MachineLowStockSubscriber(pubSubService);
   const stockLevelOkSubscriber = new MachineStockLevelOkSubscriber(
-    machines,
     pubSubService
   );
 

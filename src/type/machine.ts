@@ -7,10 +7,13 @@ export const matchState = {
 
 export type MachineState = (typeof matchState)[keyof typeof matchState];
 
-export interface IMachine {
+export type IMachine = {
   id: string;
   stockLevel: number;
   state: MachineState;
-  changeStock(adjustStockLevel: number): IMachine;
-  changeState(newState: MachineState): IMachine;
+};
+
+export abstract class IMachineRepository {
+  abstract find(id: string): IMachine;
+  abstract update(machine: IMachine): IMachine;
 }

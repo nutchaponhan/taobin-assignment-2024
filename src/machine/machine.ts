@@ -1,4 +1,9 @@
-import { IMachine, matchState, MachineState } from '../type';
+import {
+  IMachine,
+  matchState,
+  MachineState,
+  IMachineRepository,
+} from '../type';
 
 // objects
 export class Machine implements IMachine {
@@ -25,5 +30,23 @@ export class Machine implements IMachine {
   changeState(newState: MachineState): IMachine {
     this.state = newState;
     return this;
+  }
+}
+
+export class MachineRepository implements IMachineRepository {
+  constructor(private machines: IMachine[]) {}
+
+  find(id: string): IMachine {
+    return this.machines.find((m) => m.id === id) as IMachine;
+  }
+
+  update(machine: IMachine): IMachine {
+    const index = this.machines.findIndex((m) => m.id === machine.id);
+    if (index !== -1) {
+      this.machines[index] = machine;
+    }
+
+    console.log({ state: this.machines });
+    return this.machines[index];
   }
 }
