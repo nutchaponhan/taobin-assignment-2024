@@ -1,5 +1,5 @@
-import { IEvent } from '../type/machine';
-import { MachineSaleEvent, MachineRefillEvent } from '../main';
+import { IEvent } from '../type';
+import { MachineSaleEvent, MachineRefillEvent } from '../machine';
 
 // helpers
 export const randomMachine = (): string => {

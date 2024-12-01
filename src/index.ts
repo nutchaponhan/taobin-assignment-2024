@@ -3,10 +3,10 @@ import {
   MachineLowStockSubscriber,
   MachineRefillSubscriber,
   MachineSaleSubscriber,
-  MachineStockLevelOkSubscriber,
   PublishSubscribeService,
-} from './main';
-import { eventType } from './type/machine';
+} from './machine';
+import { MachineStockLevelOkSubscriber } from './machine/stock-level-ok';
+import { eventType } from './type';
 
 import { eventGenerator } from './utils/helper';
 
