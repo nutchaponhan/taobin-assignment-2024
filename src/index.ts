@@ -6,6 +6,7 @@ import {
   MachineStockLevelOkSubscriber,
   PublishSubscribeService,
 } from './main';
+import { eventType } from './type/machine';
 
 import { eventGenerator } from './utils/helper';
 
@@ -19,7 +20,7 @@ import { eventGenerator } from './utils/helper';
   ];
 
   // create 10 random events
-  const events = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => eventGenerator());
+  const events = [1, 2, 3, 4, 5].map((i) => eventGenerator());
 
   // create the PubSub service
   const pubSubService = new PublishSubscribeService(events);
@@ -36,10 +37,10 @@ import { eventGenerator } from './utils/helper';
     pubSubService
   );
 
-  pubSubService.subscribe('sale', saleSubscriber);
-  pubSubService.subscribe('refill', refillSubscriber);
-  pubSubService.subscribe('lowStock', lowStockSubscriber);
-  pubSubService.subscribe('stockLevelOk', stockLevelOkSubscriber);
+  pubSubService.subscribe(eventType.sale, saleSubscriber);
+  pubSubService.subscribe(eventType.refill, refillSubscriber);
+  pubSubService.subscribe(eventType.lowStock, lowStockSubscriber);
+  pubSubService.subscribe(eventType.stockLevelOk, stockLevelOkSubscriber);
 
   // watch all events to process
   pubSubService.watch();

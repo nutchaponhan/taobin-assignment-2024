@@ -15,8 +15,17 @@ export interface IMachine {
   changeState(newState: MachineState): IMachine;
 }
 
+export const eventType = {
+  sale: 'sale',
+  refill: 'refill',
+  lowStock: 'lowStock',
+  stockLevelOk: 'stockLevelOk',
+} as const;
+
+export type EventType = (typeof eventType)[keyof typeof eventType];
+
 export interface IEvent {
-  type(): string;
+  type(): EventType;
   machineId(): string;
 }
 

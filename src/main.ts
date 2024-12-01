@@ -5,6 +5,8 @@ import {
   ISubscriber,
   matchState,
   MachineState,
+  eventType,
+  EventType,
 } from './type/machine';
 
 // implementations
@@ -22,8 +24,8 @@ export class MachineSaleEvent implements IEvent {
     return this._sold;
   }
 
-  type(): string {
-    return 'sale';
+  type(): EventType {
+    return eventType.sale;
   }
 }
 
@@ -37,8 +39,8 @@ export class MachineRefillEvent implements IEvent {
     return this._machineId;
   }
 
-  type(): string {
-    return 'refill';
+  type(): EventType {
+    return eventType.refill;
   }
 
   getRefillStockLevel(): number {
@@ -53,8 +55,8 @@ export class MachineLowStockWarningEvent implements IEvent {
     return this._machineId;
   }
 
-  type(): string {
-    return 'lowStock';
+  type(): EventType {
+    return eventType.lowStock;
   }
 }
 
@@ -65,8 +67,8 @@ export class MachineStockLevelOkEvent implements IEvent {
     return this._machineId;
   }
 
-  type(): string {
-    return 'stockLevelOk';
+  type(): EventType {
+    return eventType.stockLevelOk;
   }
 }
 
@@ -90,8 +92,14 @@ export class MachineSaleSubscriber implements ISubscriber {
 
     machine.changeStock(-event.getSoldQuantity());
 
-    if (machine.stockLevel < 3 && prevMachineState === matchState.stockOk) {
+    if (
+      machine.stockLevel > 0 &&
+      machine.stockLevel < 3 &&
+      prevMachineState === matchState.stockOk
+    ) {
       this.sendEvent(new MachineLowStockWarningEvent(machineId));
+    } else if (machine.stockLevel <= 0) {
+      this.cancelSubscribe();
     }
 
     console.log({ state: this.machines });
@@ -99,6 +107,10 @@ export class MachineSaleSubscriber implements ISubscriber {
 
   sendEvent(event: IEvent): void {
     this.pubSubService.sendEvent(event);
+  }
+
+  cancelSubscribe(): void {
+    this.pubSubService.unsubscribe('sale');
   }
 }
 
@@ -189,15 +201,17 @@ export class PublishSubscribeService implements IPublishSubscribeService {
     const subscriber = this._subscriptions[type()];
 
     if (!subscriber) {
-      throw Error('subscriber not found');
+      // reject transaction
+      console.log('subscriber not found');
+      return;
     }
 
     console.log('publish', event);
-
     subscriber.handle(event);
   }
 
   unsubscribe(type: string): void {
+    console.log(`handle: ${type} was unsubscribe`);
     delete this._subscriptions[type];
   }
 
