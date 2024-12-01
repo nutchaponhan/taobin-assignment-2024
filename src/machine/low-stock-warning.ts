@@ -30,6 +30,7 @@ export class MachineLowStockSubscriber implements ISubscriber {
 
   handle(event: MachineLowStockWarningEvent): void {
     const machineId = event.machineId();
+
     console.log(`stock machine id :${machineId} levels drops below 3`);
   }
 

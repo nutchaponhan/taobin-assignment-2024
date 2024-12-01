@@ -30,6 +30,7 @@ export class MachineStockLevelOkSubscriber implements ISubscriber {
 
   handle(event: MachineStockLevelOkEvent): void {
     const machineId = event.machineId();
+
     console.log(`stock machine id :${machineId} levels hits 3 or above`);
   }
 
