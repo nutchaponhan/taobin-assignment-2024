@@ -17,8 +17,8 @@ export const randomMachine = (): string => {
 export const eventGenerator = (): IEvent => {
   const random = Math.random();
 
-  if (random < 0.5) {
-    const saleQty = Math.random() < 0.5 ? 1 : 2; // 1 or 2
+  if (random < 0.8) {
+    const saleQty = Math.random() < 0.5 ? 3 : 5; // 1 or 2
     return new MachineSaleEvent(saleQty, randomMachine());
   }
 

@@ -13,6 +13,7 @@ Requirement
    - increase the stock quantity of the machine
 
 3. implement new behavior
+
    - if a machine stock levels drops below 3 a new Event, LowStockWarningEvent should be generated
    - if a stock levels hits 3 or above, StockLevelOkEvent should be generated
    - LowStockWarningEvent or StockLevelOkEvent should only fire one time when crossing the threshold of 3 for each machine

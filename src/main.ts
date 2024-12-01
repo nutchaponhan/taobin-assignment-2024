@@ -39,11 +39,25 @@ export class MachineRefillEvent implements IEvent {
   }
 }
 
+export class MachineLowStockWarningEvent implements IEvent {
+  constructor(private readonly _machineId: string) {}
+
+  machineId(): string {
+    return this._machineId;
+  }
+
+  type(): string {
+    return 'lowStock';
+  }
+}
+
 export class MachineSaleSubscriber implements ISubscriber {
   public machines: Machine[];
+  private pubSubService: IPublishSubscribeService;
 
-  constructor(machines: Machine[]) {
+  constructor(machines: Machine[], pubSubService: IPublishSubscribeService) {
     this.machines = machines;
+    this.pubSubService = pubSubService;
   }
 
   handle(event: MachineSaleEvent): void {
@@ -54,15 +68,25 @@ export class MachineSaleSubscriber implements ISubscriber {
 
     this.machines[machineIndex].stockLevel -= event.getSoldQuantity();
 
-    console.log('next', { state: this.machines });
+    if (this.machines[machineIndex].stockLevel < 3) {
+      this.publish(new MachineLowStockWarningEvent(machineId));
+    }
+
+    console.log({ state: this.machines });
+  }
+
+  publish(event: IEvent): void {
+    this.pubSubService.publish(event);
   }
 }
 
 export class MachineRefillSubscriber implements ISubscriber {
   public machines: Machine[];
+  private pubSubService: IPublishSubscribeService;
 
-  constructor(machines: Machine[]) {
+  constructor(machines: Machine[], pubSubService: IPublishSubscribeService) {
     this.machines = machines;
+    this.pubSubService = pubSubService;
   }
 
   handle(event: MachineRefillEvent): void {
@@ -73,25 +97,53 @@ export class MachineRefillSubscriber implements ISubscriber {
 
     this.machines[machineIndex].stockLevel += event.getRefillStockLevel();
 
-    console.log('next', { state: this.machines });
+    console.log({ state: this.machines });
+  }
+
+  publish(event: IEvent): void {
+    this.pubSubService.publish(event);
+  }
+}
+
+export class MachineLowStockSubscriber implements ISubscriber {
+  public machines: Machine[];
+  private pubSubService: IPublishSubscribeService;
+
+  constructor(machines: Machine[], pubSubService: IPublishSubscribeService) {
+    this.machines = machines;
+    this.pubSubService = pubSubService;
+  }
+
+  handle(event: MachineRefillEvent): void {
+    const machineId = event.machineId();
+    console.log(`stock machine id :${machineId} levels drops below 3`);
+  }
+
+  publish(event: IEvent): void {
+    this.pubSubService.publish(event);
   }
 }
 
 export class PublishSubscribeService implements IPublishSubscribeService {
-  public _subscriptions: Record<string, ISubscriber> = {};
+  public _subscriptions: Record<string, ISubscriber | null> = {};
 
   publish(event: IEvent): void {
     const { type } = event;
-    console.log('publish', {
-      type: type(),
-      target: event.machineId(),
-    });
-    const handler = this._subscriptions[type()];
-    handler.handle(event);
+    const subscriber = this._subscriptions[type()];
+
+    if (!subscriber) {
+      throw Error('subscriber not found');
+    }
+
+    subscriber.handle(event);
   }
 
-  subscribe(type: string, handler: ISubscriber): void {
-    this._subscriptions[type] = handler;
+  unsubscribe(type: string): void {
+    delete this._subscriptions[type];
+  }
+
+  subscribe(type: string, subscriber: ISubscriber): void {
+    this._subscriptions[type] = subscriber;
   }
 }
 

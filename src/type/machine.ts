@@ -6,10 +6,11 @@ export interface IEvent {
 
 export interface ISubscriber {
   handle(event: IEvent): void;
+  publish(event: IEvent): void;
 }
 
 export interface IPublishSubscribeService {
   publish(event: IEvent): void;
   subscribe(type: string, handler: ISubscriber): void;
-  // unsubscribe ( /* Question 2 - build this feature */ );
+  unsubscribe(type: string): void;
 }
