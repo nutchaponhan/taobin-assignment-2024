@@ -3,6 +3,7 @@ import {
   MachineLowStockSubscriber,
   MachineRefillSubscriber,
   MachineSaleSubscriber,
+  MachineStockLevelOkSubscriber,
   PublishSubscribeService,
 } from './main';
 
@@ -17,8 +18,11 @@ import { eventGenerator } from './utils/helper';
     new Machine('003'),
   ];
 
+  // create 10 random events
+  const events = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => eventGenerator());
+
   // create the PubSub service
-  const pubSubService = new PublishSubscribeService();
+  const pubSubService = new PublishSubscribeService(events);
 
   // create a machine sale event subscriber. inject the machines (all subscribers should do this)
   const saleSubscriber = new MachineSaleSubscriber(machines, pubSubService);
@@ -27,14 +31,16 @@ import { eventGenerator } from './utils/helper';
     machines,
     pubSubService
   );
+  const stockLevelOkSubscriber = new MachineStockLevelOkSubscriber(
+    machines,
+    pubSubService
+  );
 
   pubSubService.subscribe('sale', saleSubscriber);
   pubSubService.subscribe('refill', refillSubscriber);
   pubSubService.subscribe('lowStock', lowStockSubscriber);
+  pubSubService.subscribe('stockLevelOk', stockLevelOkSubscriber);
 
-  // create 5 random events
-  const events = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => eventGenerator());
-
-  // publish the events
-  events.map((e) => pubSubService.publish(e));
+  // watch all events to process
+  pubSubService.watch();
 })();
