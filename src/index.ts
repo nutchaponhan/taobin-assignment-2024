@@ -8,7 +8,7 @@ import {
 import { MachineStockLevelOkSubscriber } from './machine/stock-level-ok';
 import { eventType } from './type';
 
-import { eventGenerator } from './utils/helper';
+import { eventGenerator, delay } from './utils';
 
 // program
 (async () => {
@@ -19,11 +19,8 @@ import { eventGenerator } from './utils/helper';
     new Machine('003'),
   ];
 
-  // create 10 random events
-  const events = [1, 2, 3, 4, 5].map((i) => eventGenerator());
-
   // create the PubSub service
-  const pubSubService = new PublishSubscribeService(events);
+  const pubSubService = new PublishSubscribeService();
 
   // create a machine sale event subscriber. inject the machines (all subscribers should do this)
   const saleSubscriber = new MachineSaleSubscriber(machines, pubSubService);
@@ -42,6 +39,9 @@ import { eventGenerator } from './utils/helper';
   pubSubService.subscribe(eventType.lowStock, lowStockSubscriber);
   pubSubService.subscribe(eventType.stockLevelOk, stockLevelOkSubscriber);
 
+  // create 5 random events
+  const events = [1, 2, 3, 4, 5].map((i) => eventGenerator());
+
   // watch all events to process
-  pubSubService.watch();
+  pubSubService.watch(events);
 })();

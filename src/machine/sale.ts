@@ -66,6 +66,6 @@ export class MachineSaleSubscriber implements ISubscriber {
   }
 
   cancelSubscribe(): void {
-    this.pubSubService.unsubscribe('sale');
+    this.pubSubService.unsubscribe(eventType.sale);
   }
 }

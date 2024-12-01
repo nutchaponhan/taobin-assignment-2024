@@ -25,3 +25,6 @@ export const eventGenerator = (): IEvent => {
   const refillQty = Math.random() < 0.5 ? 3 : 5; // 3 or 5
   return new MachineRefillEvent(refillQty, randomMachine());
 };
+
+export const delay = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms));

@@ -1,12 +1,10 @@
 import { IPublishSubscribeService, IEvent, ISubscriber } from '../type';
 
+import { delay } from '../utils';
+
 export class PublishSubscribeService implements IPublishSubscribeService {
   private _events: IEvent[] = [];
   private _subscriptions: Record<string, ISubscriber | null> = {};
-
-  constructor(events: IEvent[]) {
-    this._events = events;
-  }
 
   sendEvent(event: IEvent): void {
     this._events.push(event);
@@ -27,7 +25,7 @@ export class PublishSubscribeService implements IPublishSubscribeService {
   }
 
   unsubscribe(type: string): void {
-    console.log(`handle: ${type} was unsubscribe`);
+    console.log(`subscriber was unsubscribe event: ${type} `);
     delete this._subscriptions[type];
   }
 
@@ -35,12 +33,17 @@ export class PublishSubscribeService implements IPublishSubscribeService {
     this._subscriptions[type] = subscriber;
   }
 
-  watch(): void {
-    while (this._events.length > 0) {
-      const event = this._events.shift();
-      this.publish(event as IEvent);
-    }
+  async watch(events: IEvent[]): Promise<void> {
+    this._events = [...this._events, ...events];
 
-    console.log('stop program no more events to process...');
+    while (true) {
+      if (this._events.length > 0) {
+        const event = this._events.shift();
+        this.publish(event as IEvent);
+      } else {
+        console.log('No events to process, waiting for 1 second...');
+        await delay(1000);
+      }
+    }
   }
 }
