@@ -48,14 +48,8 @@ export class MachineSaleSubscriber implements ISubscriber {
 
     machine.changeStock(-event.getSoldQuantity());
 
-    if (
-      machine.stockLevel > 0 &&
-      machine.stockLevel < 3 &&
-      prevMachineState === matchState.stockOk
-    ) {
+    if (machine.stockLevel < 3 && prevMachineState === matchState.stockOk) {
       this.sendEvent(new MachineLowStockWarningEvent(machineId));
-    } else if (machine.stockLevel <= 0) {
-      this.cancelSubscribe();
     }
 
     console.log({ state: this.machines });

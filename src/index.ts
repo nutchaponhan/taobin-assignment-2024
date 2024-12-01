@@ -8,7 +8,7 @@ import {
 import { MachineStockLevelOkSubscriber } from './machine/stock-level-ok';
 import { eventType, IEvent } from './type';
 
-import { eventGenerator, simple } from './utils';
+import { eventGenerator, simple, complex } from './utils';
 
 const args = process.argv.slice(2);
 
@@ -16,6 +16,10 @@ function simulateEvent(): IEvent[] {
   const [plan] = args;
   if (plan === 'simple') {
     return simple();
+  }
+
+  if (plan === 'complex') {
+    return complex();
   }
 
   const events = [1, 2, 3, 4, 5].map((i) => eventGenerator());
