@@ -28,8 +28,6 @@ function simulateEvent(): IEvent[] {
 
 // program
 (async () => {
-  console.log({ args });
-
   // create 3 machines with a quantity of 10 stock
   const machines: Machine[] = [
     new Machine('001'),

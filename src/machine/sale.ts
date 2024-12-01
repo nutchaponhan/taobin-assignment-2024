@@ -29,10 +29,10 @@ export class MachineSaleEvent implements IEvent {
 }
 
 export class MachineSaleSubscriber implements ISubscriber {
-  public machines: Machine[];
-  private pubSubService: IPublishSubscribeService;
-
-  constructor(machines: Machine[], pubSubService: IPublishSubscribeService) {
+  constructor(
+    private machines: Machine[],
+    private pubSubService: IPublishSubscribeService
+  ) {
     this.machines = machines;
     this.pubSubService = pubSubService;
   }

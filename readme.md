@@ -17,3 +17,7 @@ Requirement
    - if a machine stock levels drops below 3 a new Event, LowStockWarningEvent should be generated
    - if a stock levels hits 3 or above, StockLevelOkEvent should be generated
    - LowStockWarningEvent or StockLevelOkEvent should only fire one time when crossing the threshold of 3 for each machine
+
+extra credit
+
+- implement using with repository pattern

@@ -20,10 +20,10 @@ export class MachineStockLevelOkEvent implements IEvent {
 }
 
 export class MachineStockLevelOkSubscriber implements ISubscriber {
-  public machines: Machine[];
-  private pubSubService: IPublishSubscribeService;
-
-  constructor(machines: Machine[], pubSubService: IPublishSubscribeService) {
+  constructor(
+    private machines: Machine[],
+    private pubSubService: IPublishSubscribeService
+  ) {
     this.machines = machines;
     this.pubSubService = pubSubService;
   }
