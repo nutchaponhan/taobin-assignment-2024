@@ -1,11 +1,9 @@
-import { Machine } from './machine';
 import {
   IEvent,
   EventType,
   eventType,
   ISubscriber,
   IPublishSubscribeService,
-  IMachineRepository,
 } from '../type';
 
 export class MachineLowStockWarningEvent implements IEvent {

@@ -1,4 +1,3 @@
-import { Machine } from './machine';
 import {
   IEvent,
   EventType,

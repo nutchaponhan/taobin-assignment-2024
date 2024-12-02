@@ -1,7 +1,6 @@
 import { IEvent } from '../type';
 import { MachineSaleEvent, MachineRefillEvent } from '../machine';
 
-// helpers
 export const randomMachine = (): string => {
   const random = Math.random() * 3;
 

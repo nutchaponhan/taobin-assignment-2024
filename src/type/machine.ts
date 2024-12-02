@@ -1,4 +1,3 @@
-// interfaces
 export const matchState = {
   stockLow: 'stockLow',
   stockOk: 'stockOk',
@@ -7,11 +6,11 @@ export const matchState = {
 
 export type MachineState = (typeof matchState)[keyof typeof matchState];
 
-export type IMachine = {
+export interface IMachine {
   id: string;
   stockLevel: number;
   state: MachineState;
-};
+}
 
 export abstract class IMachineRepository {
   abstract find(id: string): IMachine;

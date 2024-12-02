@@ -7,7 +7,7 @@ export const eventType = {
 
 export type EventType = (typeof eventType)[keyof typeof eventType];
 
-export interface IEvent {
-  type(): EventType;
-  machineId(): string;
+export abstract class IEvent {
+  abstract type(): EventType;
+  abstract machineId(): string;
 }

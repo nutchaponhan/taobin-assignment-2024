@@ -15,6 +15,7 @@ const args = process.argv.slice(2);
 
 function simulateEvent(): IEvent[] {
   const [plan] = args;
+
   if (plan === 'simple') {
     return simple();
   }
